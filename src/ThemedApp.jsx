@@ -2,7 +2,6 @@ import { useState, createContext, useContext } from "react";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 
 import App from "./App";
-import Header from "./components/Header";
 
 const theme = createTheme({
   palette: {
@@ -20,8 +19,7 @@ export default function ThemedApp() {
   return (
     <ThemeProvider theme={theme}>
       <AppContext.Provider value={{ showForm, setShowForm }}>
-        {/* <App /> */}
-        <Header />
+        <App />
         <CssBaseline />
       </AppContext.Provider>
     </ThemeProvider>

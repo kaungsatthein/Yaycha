@@ -19,7 +19,7 @@ export default function Header() {
           <IconButton color="inherit" onClick={() => setShowForm(!showForm)}>
             <AddIcon />
           </IconButton>
-          <IconButton color="inherit" edge="end">
+          <IconButton color="inherit" edge="end" onClick={() => {}}>
             <LightModeIcon />
           </IconButton>
         </Box>

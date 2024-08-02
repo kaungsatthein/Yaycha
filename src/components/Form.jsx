@@ -1,55 +1,30 @@
 import { useRef } from "react";
-import { useApp } from "../ThemedApp";
+import { TextField, Box, Button } from "@mui/material";
 
 export default function Form({ add }) {
-  const { mode } = useApp();
   const contentRef = useRef();
-  const nameRef = useRef();
 
   return (
     <form
-      action=""
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 3,
-        padding: 10,
-        borderRadius: 8,
-        marginBottom: 20,
-        background: mode === "dark" ? "#555" : "#def",
-      }}
       onSubmit={(e) => {
         e.preventDefault();
         const content = contentRef.current.value;
-        const name = nameRef.current.value;
-
-        add(content, name);
+        add(content, "Alice");
         e.currentTarget.reset();
       }}
     >
-      <input
-        type="text"
-        placeholder="Content"
-        ref={contentRef}
-        style={{ padding: 5 }}
-      />
-      <input
-        type="text"
-        placeholder="Name"
-        ref={nameRef}
-        style={{ padding: 5 }}
-      />
-      <button
-        type="submit"
-        style={{
-          padding: 8,
-          background: "#0d6efd",
-          color: "white",
-          border: "0 none",
-        }}
-      >
+      <Box sx={{ mb: 2, textAlign: "right" }}>
+        <TextField
+          inputRef={contentRef}
+          type="text"
+          placeholder="Content"
+          fullWidth
+          sx={{ mb: 1 }}
+        />
+      </Box>
+      <Button variant="contained" type="submit" sx={{ mb: 4 }}>
         Post
-      </button>
+      </Button>
     </form>
   );
 }
