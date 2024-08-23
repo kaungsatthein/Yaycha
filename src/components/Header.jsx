@@ -3,11 +3,12 @@ import {
   Menu as MenuIcon,
   Add as AddIcon,
   LightMode as LightModeIcon,
+  DarkMode as DarkModeIcon,
 } from "@mui/icons-material";
 import { useApp } from "../ThemedApp";
 
 export default function Header() {
-  const { showForm, setShowForm } = useApp();
+  const { showForm, setShowForm, mode, setMode } = useApp();
   return (
     <AppBar position="static">
       <Toolbar>
@@ -19,9 +20,23 @@ export default function Header() {
           <IconButton color="inherit" onClick={() => setShowForm(!showForm)}>
             <AddIcon />
           </IconButton>
-          <IconButton color="inherit" edge="end" onClick={() => {}}>
-            <LightModeIcon />
-          </IconButton>
+          {mode === "dark" ? (
+            <IconButton
+              color="inherit"
+              edge="end"
+              onClick={() => setMode("light")}
+            >
+              <LightModeIcon />
+            </IconButton>
+          ) : (
+            <IconButton
+              color="inherit"
+              edge="end"
+              onClick={() => setMode("dark")}
+            >
+              <DarkModeIcon />
+            </IconButton>
+          )}
         </Box>
       </Toolbar>
     </AppBar>
