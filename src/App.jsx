@@ -12,15 +12,17 @@ export default function App() {
     { id: 2, content: "React is fun.", name: "Bob" },
     { id: 3, content: "Yay, interesting.", name: "Chris" },
   ]);
-  const { showForm } = useApp();
+  const { showForm, setGlobalMsg } = useApp();
 
   const add = (content, name) => {
     const id = data[data.length - 1].id + 1;
     setData([...data, { id, content, name }]);
+    setGlobalMsg("An item added successfully!");
   };
 
   const remove = (id) => {
     setData(data.filter((item) => item.id !== id));
+    setGlobalMsg("An item removed successfully!");
   };
 
   return (

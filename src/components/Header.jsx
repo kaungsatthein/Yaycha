@@ -8,11 +8,15 @@ import {
 import { useApp } from "../ThemedApp";
 
 export default function Header() {
-  const { showForm, setShowForm, mode, setMode } = useApp();
+  const { showForm, setShowForm, mode, setMode, setShowDrawer } = useApp();
   return (
     <AppBar position="static">
       <Toolbar>
-        <IconButton color="inherit" edge="start">
+        <IconButton
+          color="inherit"
+          edge="start"
+          onClick={() => setShowDrawer(true)}
+        >
           <MenuIcon />
         </IconButton>
         <Typography sx={{ flexGrow: 1, ml: 2 }}>Yaycha</Typography>
