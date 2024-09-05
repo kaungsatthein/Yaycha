@@ -10,6 +10,7 @@ import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import Comments from "./pages/Comments";
 import Likes from "./pages/Likes";
+import { QueryClient, QueryClientProvider } from "react-query";
 
 const AppContext = createContext();
 export function useApp() {
@@ -49,6 +50,8 @@ const router = createBrowserRouter([
   },
 ]);
 
+export const queryClient = new QueryClient();
+
 export default function ThemedApp() {
   const [showDrawer, setShowDrawer] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -84,7 +87,9 @@ export default function ThemedApp() {
           setMode,
         }}
       >
-        <RouterProvider router={router} />
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+        </QueryClientProvider>
         <CssBaseline />
       </AppContext.Provider>
     </ThemeProvider>

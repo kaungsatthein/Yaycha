@@ -54,10 +54,12 @@ export default function AppDrawer() {
                 background: deepPurple[500],
               }}
             />
-            <Typography sx={{ fontWeight: "bold" }}>Alice</Typography>
+            <Typography sx={{ fontWeight: "bold" }}>
+              {auth ? auth.name : "Guest"}
+            </Typography>
           </Box>
         </Box>
-        <List>
+        <List onClick={() => setShowDrawer(false)}>
           <ListItem>
             <ListItemButton onClick={() => navigate("/")}>
               <ListItemIcon>
@@ -70,7 +72,7 @@ export default function AppDrawer() {
           {auth && (
             <>
               <ListItem>
-                <ListItemButton onClick={() => navigate("/profile/1")}>
+                <ListItemButton onClick={() => navigate(`/profile/${auth.id}`)}>
                   <ListItemIcon>
                     <ProfileIcon />
                   </ListItemIcon>
@@ -78,7 +80,13 @@ export default function AppDrawer() {
                 </ListItemButton>
               </ListItem>
               <ListItem>
-                <ListItemButton onClick={() => setAuth(null)}>
+                <ListItemButton
+                  onClick={() => {
+                    localStorage.removeItem("token");
+                    setAuth(null);
+                    navigate("/");
+                  }}
+                >
                   <ListItemIcon>
                     <LogoutIcon color="error" />
                   </ListItemIcon>
