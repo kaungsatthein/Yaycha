@@ -37,3 +37,64 @@ export async function fetchUser(id) {
   });
   return res.json();
 }
+
+export async function fetchVerify() {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${api}/verify`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (res.ok) {
+    return res.json();
+  }
+  return false;
+}
+export async function postPost(content) {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${api}/content/posts`, {
+    method: "POST",
+    body: JSON.stringify({ content }),
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    return res.json();
+  }
+  throw new Error("Error: Check Network Log");
+}
+
+export async function postComment(content, postId) {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${api}/content/comments`, {
+    method: "POST",
+    body: JSON.stringify({ content, postId }),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (res.ok) {
+    return res.json();
+  }
+  throw new Error("Error: Check Network Log");
+}
+
+export async function postDelete(postId) {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${api}/content/posts/${postId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Error: ${errorText}`);
+  }
+
+  return res.status;
+}

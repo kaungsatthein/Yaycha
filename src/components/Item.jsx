@@ -44,7 +44,7 @@ export default function Item({ item, remove, primary, comment }) {
           <IconButton
             size="small"
             onClick={(e) => {
-              remove(item.id);
+              remove.mutate(item.id);
               e.stopPropagation();
             }}
           >
