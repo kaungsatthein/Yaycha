@@ -3,9 +3,10 @@ import { Box, Alert } from "@mui/material";
 import Form from "../components/Form";
 import Item from "../components/Item";
 import { queryClient, useApp } from "../ThemedApp";
+import { postDelete, postPost } from "../libs/fetcher";
 
 export default function Home() {
-  const { showForm, setGlobalMsg } = useApp();
+  const { showForm, setGlobalMsg, auth } = useApp();
 
   const api = import.meta.env.VITE_API;
 
@@ -14,28 +15,27 @@ export default function Home() {
     return res.json();
   });
 
-  const remove = useMutation(
-    async (id) => {
-      await fetch(`${api}/content/posts/${id}`, {
-        method: "DELETE",
-      });
+  const add = useMutation(async (content) => postPost(content), {
+    onSuccess: async (post) => {
+      await queryClient.cancelQueries("posts");
+      await queryClient.setQueryData("posts", (old) => [post, ...old]);
+      setGlobalMsg("A post added successfully.");
     },
-    {
-      onMutate: (id) => {
-        queryClient.cancelQueries("posts");
-        queryClient.setQueryData("posts", (old) =>
-          old.filter((item) => item.id !== id)
-        );
-        setGlobalMsg("A post deleted successfully.");
-      },
-    }
-  );
+  });
 
-  const add = (content, name) => {
-    const id = data[0].id + 1;
-    setData([{ id, content, name }, ...data]);
-    setGlobalMsg("An item added");
-  };
+  const remove = useMutation(async (contentId) => postDelete(contentId), {
+    // onSuccess: async (contentId) => {
+    //   await queryClient.cancelQueries("posts");
+    //   await queryClient.setQueryData("posts", (old) =>
+    //     old.filter((post) => post.id !== contentId)
+    //   );
+    //   setGlobalMsg("A post deleted successfully.");
+    // },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries("posts");
+      setGlobalMsg("A post deleted successfully.");
+    },
+  });
 
   if (isError) {
     return (
@@ -51,9 +51,9 @@ export default function Home() {
 
   return (
     <Box>
-      {showForm && <Form add={add} />}
+      {showForm && auth && <Form add={add} />}
       {data.map((item) => {
-        return <Item key={item.id} item={item} remove={remove.mutate} />;
+        return <Item key={item.id} item={item} remove={remove} />;
       })}
     </Box>
   );
