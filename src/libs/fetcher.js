@@ -98,3 +98,20 @@ export async function postDelete(postId) {
 
   return res.status;
 }
+
+export async function commentDelete(commentId) {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${api}/content/comments/${commentId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Error: ${errorText}`);
+  }
+
+  return res.status;
+}

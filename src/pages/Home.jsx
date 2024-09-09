@@ -24,13 +24,6 @@ export default function Home() {
   });
 
   const remove = useMutation(async (contentId) => postDelete(contentId), {
-    // onSuccess: async (contentId) => {
-    //   await queryClient.cancelQueries("posts");
-    //   await queryClient.setQueryData("posts", (old) =>
-    //     old.filter((post) => post.id !== contentId)
-    //   );
-    //   setGlobalMsg("A post deleted successfully.");
-    // },
     onSuccess: async () => {
       await queryClient.invalidateQueries("posts");
       setGlobalMsg("A post deleted successfully.");
@@ -53,7 +46,7 @@ export default function Home() {
     <Box>
       {showForm && auth && <Form add={add} />}
       {data.map((item) => {
-        return <Item key={item.id} item={item} remove={remove} />;
+        return <Item key={item.id} item={item} remove={remove.mutate} />;
       })}
     </Box>
   );

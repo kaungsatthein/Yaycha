@@ -1,36 +1,26 @@
 import { Avatar, Box, Typography, Alert } from "@mui/material";
 import { pink } from "@mui/material/colors";
 import { useParams } from "react-router-dom";
-import { fetchUser } from "../libs/fetcher";
+import { fetchUser, postDelete } from "../libs/fetcher";
 import { useMutation, useQuery } from "react-query";
 import Item from "../components/Item";
-import ThemedApp, { queryClient } from "../ThemedApp";
+import { queryClient, useApp } from "../ThemedApp";
 
 export default function Profile() {
   const { id } = useParams();
-  const { setGlobalMsg } = ThemedApp();
+  const { setGlobalMsg } = useApp();
 
   const { isLoading, isError, error, data } = useQuery(
     `users/${id}`,
     async () => fetchUser(id)
   );
 
-  const remove = useMutation(
-    async (id) => {
-      await fetch(`${api}/content/posts/${id}`, {
-        method: "DELETE",
-      });
+  const remove = useMutation(async (id) => postDelete(id), {
+    onSuccess: async () => {
+      await queryClient.invalidateQueries(`users/${id}`);
+      setGlobalMsg("A post deleted successfully.");
     },
-    {
-      onMutate: (id) => {
-        queryClient.cancelQueries("posts");
-        queryClient.setQueryData("posts", (old) =>
-          old.filter((item) => item.id !== id)
-        );
-        setGlobalMsg("A post deleted successfully.");
-      },
-    }
-  );
+  });
 
   if (isError) {
     return (
@@ -71,7 +61,7 @@ export default function Profile() {
               <Typography>Error: {error.message}</Typography> // Show error message
             ) : data?.posts && data.posts.length > 0 ? (
               data.posts.map((item) => (
-                <Item key={item.id} item={item} remove={remove.mutation} />
+                <Item key={item.id} item={item} remove={remove.mutate} />
               ))
             ) : (
               <Typography>No posts available</Typography> // Show no posts message

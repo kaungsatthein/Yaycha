@@ -4,7 +4,7 @@ import Item from "../components/Item";
 import { useNavigate, useParams } from "react-router-dom";
 import { queryClient, useApp } from "../ThemedApp";
 import { useMutation, useQuery } from "react-query";
-import { postComment } from "../libs/fetcher";
+import { commentDelete, postComment, postDelete } from "../libs/fetcher";
 import { useRef } from "react";
 
 const api = import.meta.env.VITE_API;
@@ -20,28 +20,20 @@ export default function Comments() {
     return res.json();
   });
 
-  const removePost = useMutation(async (id) => {
-    await fetch(`${api}/content/posts/${id}`, {
-      method: "DELETE",
-    });
-    navigate("/");
-    setGlobalMsg("Post removed successfully");
+  const removePost = useMutation(async (contentId) => postDelete(contentId), {
+    onSuccess: async () => {
+      await queryClient.invalidateQueries("posts");
+      setGlobalMsg("A post deleted successfully.");
+      navigate("/");
+    },
   });
 
   const removeComment = useMutation(
-    async (id) => {
-      await fetch(`${api}/content/comments/${id}`, {
-        method: "DELETE",
-      });
-    },
+    async (commentId) => commentDelete(commentId),
     {
-      onMutate: (id) => {
-        queryClient.cancelQueries("comments");
-        queryClient.setQueryData("comments", (old) => {
-          old.comments = old.comments.filter((comment) => comment.id !== id);
-          return { ...old };
-        });
-        setGlobalMsg("A comment deleted");
+      onSuccess: async () => {
+        await queryClient.invalidateQueries("comments");
+        setGlobalMsg("A comment deleted successfully.");
       },
     }
   );
