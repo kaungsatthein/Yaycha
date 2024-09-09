@@ -9,11 +9,14 @@ import {
 import { green } from "@mui/material/colors";
 import { formatRelative } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import { useApp } from "../ThemedApp";
 
 export default function Item({ item, remove, primary, comment }) {
   const navigate = useNavigate();
+  const { auth } = useApp();
+
   return (
-    <Card sx={{ mb: 2 }}>
+    <Card sx={{ mb: 2, minWidth: "400px" }}>
       {primary && <Box sx={{ height: 50, bgcolor: green[500] }} />}
       <CardContent
         onClick={() => {
@@ -41,19 +44,20 @@ export default function Item({ item, remove, primary, comment }) {
               {formatRelative(item.created, new Date())}
             </Typography>
           </Box>
-          <IconButton
-            size="small"
-            onClick={(e) => {
-              remove.mutate(item.id);
-              e.stopPropagation();
-            }}
-          >
-            <DeleteIcon fontSize="inherit" />
-          </IconButton>
+          {auth?.id === item.userId && (
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                remove(item.id);
+                e.stopPropagation();
+              }}
+            >
+              <DeleteIcon fontSize="inherit" />
+            </IconButton>
+          )}
         </Box>
         <Typography sx={{ my: 3 }}>{item.content}</Typography>
-
-        {item.user ? (
+        {item.user && (
           <Box
             onClick={(e) => {
               navigate(`/profile/${item.user.id}`);
@@ -69,8 +73,6 @@ export default function Item({ item, remove, primary, comment }) {
             <UserIcon fontSize="12" color="info" />
             <Typography variant="caption">{item.user.name}</Typography>
           </Box>
-        ) : (
-          ""
         )}
       </CardContent>
     </Card>
