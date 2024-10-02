@@ -1,35 +1,45 @@
-import { useQuery, useMutation } from "react-query";
-import { Box, Alert } from "@mui/material";
+import { useState } from "react";
+import { Alert, Box, Button, Typography } from "@mui/material";
 import Form from "../components/Form";
 import Item from "../components/Item";
-import { queryClient, useApp } from "../ThemedApp";
-import { postDelete, postPost } from "../libs/fetcher";
-
+import { useApp } from "../ThemedApp";
+import { useQuery, useMutation } from "react-query";
+import { queryClient } from "../ThemedApp";
+import {
+  postDelete,
+  fetchPosts,
+  postPost,
+  fetchFollowingPosts,
+} from "../libs/fetcher";
 export default function Home() {
+  const [showLatest, setShowLatest] = useState(true);
   const { showForm, setGlobalMsg, auth } = useApp();
-
-  const api = import.meta.env.VITE_API;
-
-  const { isLoading, isError, error, data } = useQuery("posts", async () => {
-    const res = await fetch(`${api}/content/posts`);
-    return res.json();
+  const { isLoading, isError, error, data } = useQuery(
+    ["posts", showLatest],
+    () => {
+      if (showLatest) return fetchPosts();
+      else return fetchFollowingPosts();
+    }
+  );
+  const remove = useMutation(async (id) => postDelete(id), {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries("posts");
+      await queryClient.setQueryData(["posts", showLatest], (old) =>
+        old.filter((item) => item.id !== id)
+      );
+      setGlobalMsg("A post deleted");
+    },
   });
-
-  const add = useMutation(async (content) => postPost(content), {
+  const add = useMutation((content) => postPost(content), {
     onSuccess: async (post) => {
       await queryClient.cancelQueries("posts");
-      await queryClient.setQueryData("posts", (old) => [post, ...old]);
-      setGlobalMsg("A post added successfully.");
+      await queryClient.setQueryData(["posts", showLatest], (old) => [
+        post,
+        ...old,
+      ]);
+      setGlobalMsg("A post added");
     },
   });
-
-  const remove = useMutation(async (contentId) => postDelete(contentId), {
-    onSuccess: async () => {
-      await queryClient.invalidateQueries("posts");
-      setGlobalMsg("A post deleted successfully.");
-    },
-  });
-
   if (isError) {
     return (
       <Box>
@@ -37,14 +47,40 @@ export default function Home() {
       </Box>
     );
   }
-
   if (isLoading) {
     return <Box sx={{ textAlign: "center" }}>Loading...</Box>;
   }
-
   return (
     <Box>
       {showForm && auth && <Form add={add} />}
+      {auth && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            mb: 1,
+          }}
+        >
+          <Button
+            size="small"
+            variant={showLatest ? "contained" : "text"}
+            onClick={() => setShowLatest(true)}
+          >
+            Latest
+          </Button>
+          <Typography sx={{ color: "text.fade", fontSize: 15, mx: "15px" }}>
+            |
+          </Typography>
+          <Button
+            size="small"
+            variant={!showLatest ? "contained" : "text"}
+            onClick={() => setShowLatest(false)}
+          >
+            Following
+          </Button>
+        </Box>
+      )}
       {data.map((item) => {
         return <Item key={item.id} item={item} remove={remove.mutate} />;
       })}
