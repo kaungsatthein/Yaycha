@@ -1,10 +1,12 @@
-import { Avatar, Box, Typography, Alert } from "@mui/material";
+import { Avatar, Box, Typography, Alert, IconButton } from "@mui/material";
 import { pink } from "@mui/material/colors";
 import { useParams } from "react-router-dom";
 import { fetchUser, postDelete } from "../libs/fetcher";
 import { useMutation, useQuery } from "react-query";
 import Item from "../components/Item";
 import { queryClient, useApp } from "../ThemedApp";
+import FollowButton from "../components/FollowButton";
+import { mt } from "date-fns/locale";
 
 export default function Profile() {
   const { id } = useParams();
@@ -54,6 +56,8 @@ export default function Profile() {
           <Typography sx={{ fontSize: "0.8em", color: "text.fade" }}>
             {data.bio}
           </Typography>
+          {console.log(data)}
+          <FollowButton user={data} />
           <Box sx={{ marginTop: "50px" }}>
             {isLoading ? (
               <Typography>Loading...</Typography> // Show loading state

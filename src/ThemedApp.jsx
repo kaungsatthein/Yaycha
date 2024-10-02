@@ -11,6 +11,7 @@ import Comments from "./pages/Comments";
 import Likes from "./pages/Likes";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { fetchVerify } from "./libs/fetcher";
+import Search from "./pages/Search";
 
 const AppContext = createContext();
 
@@ -46,6 +47,10 @@ const router = createBrowserRouter([
       {
         path: "/likes/:id/:type",
         element: <Likes />,
+      },
+      {
+        path: "/search",
+        element: <Search />,
       },
     ],
   },

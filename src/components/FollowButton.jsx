@@ -2,58 +2,61 @@ import { Button } from "@mui/material";
 import { useMutation } from "react-query";
 import { useApp, queryClient } from "../ThemedApp";
 import { postFollow, deleteFollow } from "../libs/fetcher";
+import { useState, useEffect } from "react";
 
 export default function FollowButton({ user }) {
   const { auth } = useApp();
+  const [isFollowingUser, setIsFollowingUser] = useState(false);
 
-  if (!auth) return <></>;
-
-  function isFollowing() {
-    return user.following.find((item) => item.followerId == auth.id);
-  }
-
-  const follow = useMutation(
-    (id) => {
-      return postFollow(id);
-    },
-    {
-      onSuccess: async () => {
-        await queryClient.refetchQueries("users");
-        await queryClient.refetchQueries("user");
-        await queryClient.refetchQueries("search");
-      },
+  // Check if the user is following on initial render
+  useEffect(() => {
+    if (user.following) {
+      setIsFollowingUser(
+        user.following.some((item) => item.followerId === auth.id)
+      );
     }
-  );
-  const unfollow = useMutation(
-    (id) => {
-      return deleteFollow(id);
+  }, [user, auth.id]);
+
+  if (!auth) return <></>; // Exit if not authenticated
+
+  const follow = useMutation((id) => postFollow(id), {
+    onSuccess: () => {
+      setIsFollowingUser(true); // Update local state
+      // Optionally refetch queries if needed
+      queryClient.refetchQueries("users");
+      queryClient.refetchQueries("user");
+      queryClient.refetchQueries("search");
     },
-    {
-      onSuccess: async () => {
-        await queryClient.refetchQueries("users");
-        await queryClient.refetchQueries("user");
-        await queryClient.refetchQueries("search");
-      },
-    }
-  );
+  });
+
+  const unfollow = useMutation((id) => deleteFollow(id), {
+    onSuccess: () => {
+      setIsFollowingUser(false); // Update local state
+      // Optionally refetch queries if needed
+      queryClient.refetchQueries("users");
+      queryClient.refetchQueries("user");
+      queryClient.refetchQueries("search");
+    },
+  });
+
   return auth.id === user.id ? (
     <></>
   ) : (
     <Button
       size="small"
       edge="end"
-      variant={isFollowing() ? "outlined" : "contained"}
-      sx={{ borderRadius: 5 }}
+      variant={isFollowingUser ? "outlined" : "contained"}
+      sx={{ borderRadius: 5, mt: "15px" }} // Apply additional styles
       onClick={(e) => {
-        if (isFollowing()) {
-          unfollow.mutate(user.id);
+        e.stopPropagation(); // Prevent event bubbling
+        if (isFollowingUser) {
+          unfollow.mutate(user.id); // Unfollow
         } else {
-          follow.mutate(user.id);
+          follow.mutate(user.id); // Follow
         }
-        e.stopPropagation();
       }}
     >
-      {isFollowing() ? "Following" : "Follow"}
+      {isFollowingUser ? "Following" : "Follow"}
     </Button>
   );
 }
