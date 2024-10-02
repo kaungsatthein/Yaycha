@@ -1,5 +1,9 @@
 const api = import.meta.env.VITE_API;
 
+const getToken = () => {
+  return localStorage.getItem("token");
+};
+
 export async function postUser(data) {
   const res = await fetch(`${api}/users`, {
     method: "POST",
@@ -29,7 +33,7 @@ export async function postLogin(username, password) {
 }
 
 export async function fetchUser(id) {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   const res = await fetch(`${api}/users/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -39,7 +43,7 @@ export async function fetchUser(id) {
 }
 
 export async function fetchVerify() {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   const res = await fetch(`${api}/verify`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -51,7 +55,7 @@ export async function fetchVerify() {
   return false;
 }
 export async function postPost(content) {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   const res = await fetch(`${api}/content/posts`, {
     method: "POST",
     body: JSON.stringify({ content }),
@@ -67,7 +71,7 @@ export async function postPost(content) {
 }
 
 export async function postComment(content, postId) {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   const res = await fetch(`${api}/content/comments`, {
     method: "POST",
     body: JSON.stringify({ content, postId }),
@@ -83,7 +87,7 @@ export async function postComment(content, postId) {
 }
 
 export async function postDelete(postId) {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   const res = await fetch(`${api}/content/posts/${postId}`, {
     method: "DELETE",
     headers: {
@@ -100,7 +104,7 @@ export async function postDelete(postId) {
 }
 
 export async function commentDelete(commentId) {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   const res = await fetch(`${api}/content/comments/${commentId}`, {
     method: "DELETE",
     headers: {
@@ -114,4 +118,76 @@ export async function commentDelete(commentId) {
   }
 
   return res.status;
+}
+
+export async function postPostLike(id) {
+  const token = getToken();
+  const res = await fetch(`${api}/content/like/posts/${id}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.json();
+}
+
+export async function postCommentLike(id) {
+  const token = getToken();
+  const res = await fetch(`${api}/content/like/comments/${id}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.json();
+}
+export async function deletePostLike(id) {
+  const token = getToken();
+  const res = await fetch(`${api}/content/unlike/posts/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.json();
+}
+export async function deleteCommentLike(id) {
+  const token = getToken();
+  const res = await fetch(`${api}/content/unlike/comments/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.json();
+}
+export async function fetchPostLikes(id) {
+  const res = await fetch(`${api}/content/likes/posts/${id}`);
+  return res.json();
+}
+export async function fetchCommentLikes(id) {
+  const res = await fetch(`${api}/content/likes/comments/${id}`);
+  return res.json();
+}
+
+export async function postFollow(id) {
+  const token = getToken();
+  const res = await fetch(`${api}/follow/${id}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.json();
+}
+
+export async function deleteFollow(id) {
+  const token = getToken();
+  const res = await fetch(`${api}/unfollow/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.json();
 }
